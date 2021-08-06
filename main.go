@@ -12,7 +12,8 @@ func main() {
 	var token = flag.String("token", "", "telegram bot token")
 	var deleteTimeout = flag.Int("timeout", 180, "delete processed messages after n seconds")
 	var notesPath = flag.String("path", "", "path to save notes")
-	var templatePath = flag.String("template", "", "path to template")
+	var templatePath = flag.String("template", "", "path to template folder")
+	var templateFile = flag.String("file", "telegram.md", "template file")
 	flag.Parse()
 
 	if *token == "" {
@@ -27,7 +28,7 @@ func main() {
 		*token,
 		*deleteTimeout,
 		*notesPath,
-		*templatePath,
+		*templatePath+*templateFile,
 	)
 	if err != nil {
 		log.Fatalf("failed to create bot: %s", err)

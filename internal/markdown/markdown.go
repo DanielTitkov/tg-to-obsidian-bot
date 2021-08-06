@@ -15,7 +15,6 @@ const (
 )
 
 func WrapWithMarkdown(text, template, title string) (string, error) {
-
 	noteText := strings.ReplaceAll(template, contentPlaceholder, text)
 	noteText = strings.ReplaceAll(noteText, titlePlaceholder, title)
 	noteText = strings.ReplaceAll(noteText, datePlaceholder, time.Now().Format(dateFormat))

@@ -75,9 +75,13 @@ func (b *Bot) MessageToObsidianHandler(m *tb.Message) {
 		log.Println(errMsg)
 		return
 	}
+
 	log.Printf("saved to file: %s", filePath)
 
-	reply, err := b.Telebot.Send(m.Sender, fmt.Sprintf("Сообщение обработано! Удалим через %d секунд.\n\nСоздана заметка:\n%s", b.Timeout, noteText))
+	reply, err := b.Telebot.Send(
+		m.Sender,
+		fmt.Sprintf("Сообщение обработано! Удалим через %d секунд.\n\nСоздана заметка:\n%s", b.Timeout, noteText),
+	)
 	if err != nil {
 		log.Println("failed to send reply", err)
 	}
