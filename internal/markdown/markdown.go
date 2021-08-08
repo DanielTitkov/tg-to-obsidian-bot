@@ -11,16 +11,18 @@ const (
 	timePlaceholder    = "{{time}}"
 	datePlaceholder    = "{{date}}"
 	titlePlaceholder   = "{{title}}"
+	refPlaceholder     = "{{ref}}"
 	dateFormat         = "2006-01-02"
 	timeFormat         = "15:04"
 	titleRegex         = `^#\s.*\n`
 )
 
-func WrapWithMarkdown(text, template, title string) (string, error) {
+func WrapWithMarkdown(text, template, title, ref string) (string, error) {
 	noteText := strings.ReplaceAll(template, contentPlaceholder, text)
 	noteText = strings.ReplaceAll(noteText, titlePlaceholder, title)
 	noteText = strings.ReplaceAll(noteText, datePlaceholder, time.Now().Format(dateFormat))
 	noteText = strings.ReplaceAll(noteText, timePlaceholder, time.Now().Format(timeFormat))
+	noteText = strings.ReplaceAll(noteText, refPlaceholder, ref)
 
 	return noteText, nil
 }

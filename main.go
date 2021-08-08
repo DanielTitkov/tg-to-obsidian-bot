@@ -37,6 +37,7 @@ func main() {
 	}
 
 	tgBot.Telebot.Handle(tb.OnText, tgBot.MessageToObsidianHandler)
+	// tbBot.Telebot.Handle(tb.On)
 	log.Println("Starting bot...")
 	tgBot.Telebot.Start()
 }

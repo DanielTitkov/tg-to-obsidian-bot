@@ -13,6 +13,7 @@ import (
 const (
 	datetimeFormat = "2006-01-02 15:04:05"
 	titleFormat    = "Telegram Note %s"
+	refLinkFormat  = "https://t.me/%s/%d"
 )
 
 type Bot struct {
@@ -58,6 +59,16 @@ func (b *Bot) MessageToObsidianHandler(m *tb.Message) {
 		return
 	}
 
+	var originalMessageLink string
+	if m.IsForwarded() {
+		if m.OriginalChat != nil {
+			originalMessageLink = fmt.Sprintf(refLinkFormat,
+				m.OriginalChat.Username,
+				m.OriginalMessageID,
+			)
+		}
+	}
+
 	text, title, err := markdown.ExtractTitle(m.Text)
 	if err != nil {
 		errMsg := fmt.Sprintf("failed to extract title: %s", err)
@@ -70,7 +81,7 @@ func (b *Bot) MessageToObsidianHandler(m *tb.Message) {
 		title = fmt.Sprintf(titleFormat, time.Now().Format(datetimeFormat))
 	}
 
-	noteText, err := markdown.WrapWithMarkdown(text, string(template), title)
+	noteText, err := markdown.WrapWithMarkdown(text, string(template), title, originalMessageLink)
 	if err != nil {
 		errMsg := fmt.Sprintf("failed to convert message to note: %s", err)
 		b.Telebot.Send(m.Sender, errMsg)
@@ -92,7 +103,7 @@ func (b *Bot) MessageToObsidianHandler(m *tb.Message) {
 
 		log.Printf("saved to file: %s", filePath)
 	} else {
-		log.Printf("running in debug mode, saving omitted, generated path: %s", filePath)
+		log.Printf("running in debug mode, saving omitted, path: %s", filePath)
 	}
 
 	reply, err := b.Telebot.Send(
