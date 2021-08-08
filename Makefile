@@ -11,10 +11,11 @@ export
 .PHONY: run
 run:
 	go run main.go \
-		-timeout=30 \
+		-timeout=6 \
 		-token=$(TG_TOKEN) \
 		-template=$(TEMPLATE_PATH) \
-		-path=$(NOTES_PATH)
+		-path=$(NOTES_PATH) \
+		-debug
 
 .PHONY: build
 build:
@@ -25,6 +26,10 @@ build:
 .PHONY: up
 up:
 	UID="${CURRENT_UID}" GID="${CURRENT_GID}" docker-compose up --build -d
+
+.PHONY: down
+down:
+	docker-compose down
 
 # not to fail if .env is not present
 .env:

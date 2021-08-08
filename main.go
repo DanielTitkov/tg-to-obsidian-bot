@@ -14,6 +14,7 @@ func main() {
 	var notesPath = flag.String("path", "", "path to save notes")
 	var templatePath = flag.String("template", "", "path to template folder")
 	var templateFile = flag.String("file", "telegram.md", "template file")
+	var debug = flag.Bool("debug", false, "run in debug mode (without saving files)")
 	flag.Parse()
 
 	if *token == "" {
@@ -29,6 +30,7 @@ func main() {
 		*deleteTimeout,
 		*notesPath,
 		*templatePath+*templateFile,
+		*debug,
 	)
 	if err != nil {
 		log.Fatalf("failed to create bot: %s", err)

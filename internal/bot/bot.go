@@ -20,6 +20,7 @@ type Bot struct {
 	Timeout      int
 	NotesPath    string
 	TemplatePath string
+	Debug        bool
 }
 
 func NewBot(
@@ -27,6 +28,7 @@ func NewBot(
 	deleteTimeout int,
 	notesPath string,
 	templatePath string,
+	debug bool,
 ) (*Bot, error) {
 	b, err := tb.NewBot(tb.Settings{
 		Token:  token,
@@ -42,6 +44,7 @@ func NewBot(
 		Timeout:      deleteTimeout,
 		NotesPath:    notesPath,
 		TemplatePath: templatePath,
+		Debug:        debug,
 	}, nil
 }
 
@@ -55,9 +58,19 @@ func (b *Bot) MessageToObsidianHandler(m *tb.Message) {
 		return
 	}
 
-	title := fmt.Sprintf(titleFormat, time.Now().Format(datetimeFormat))
+	text, title, err := markdown.ExtractTitle(m.Text)
+	if err != nil {
+		errMsg := fmt.Sprintf("failed to extract title: %s", err)
+		b.Telebot.Send(m.Sender, errMsg)
+		log.Println(errMsg)
+		return
+	}
 
-	noteText, err := markdown.WrapWithMarkdown(m.Text, string(template), title)
+	if title == "" {
+		title = fmt.Sprintf(titleFormat, time.Now().Format(datetimeFormat))
+	}
+
+	noteText, err := markdown.WrapWithMarkdown(text, string(template), title)
 	if err != nil {
 		errMsg := fmt.Sprintf("failed to convert message to note: %s", err)
 		b.Telebot.Send(m.Sender, errMsg)
@@ -68,15 +81,19 @@ func (b *Bot) MessageToObsidianHandler(m *tb.Message) {
 	log.Printf("\ngenerated markdown:\n---\n%s\n---\n", noteText)
 
 	filePath := b.NotesPath + fmt.Sprintf("%s.md", title)
-	err = ioutil.WriteFile(filePath, []byte(noteText), 0644)
-	if err != nil {
-		errMsg := fmt.Sprintf("failed to save file: %s", err)
-		b.Telebot.Send(m.Sender, errMsg)
-		log.Println(errMsg)
-		return
-	}
+	if !b.Debug {
+		err = ioutil.WriteFile(filePath, []byte(noteText), 0644)
+		if err != nil {
+			errMsg := fmt.Sprintf("failed to save file: %s", err)
+			b.Telebot.Send(m.Sender, errMsg)
+			log.Println(errMsg)
+			return
+		}
 
-	log.Printf("saved to file: %s", filePath)
+		log.Printf("saved to file: %s", filePath)
+	} else {
+		log.Printf("running in debug mode, saving omitted, generated path: %s", filePath)
+	}
 
 	reply, err := b.Telebot.Send(
 		m.Sender,
