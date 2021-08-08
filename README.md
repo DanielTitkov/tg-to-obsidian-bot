@@ -4,7 +4,7 @@ Bot that converts to messages from tg channel to obsidian notes
 
 ## Requirements
 
-- docker
+- docker & docker-compose
 - make
 
 ## Usage
@@ -29,6 +29,10 @@ After this is done just run `make up` to set up the container with bot binary. I
 - TEMPLATE_FILE - template file name
 - TIMEOUT - time in seconds after which bot will delete processed messages from chat
 
+## Title detection 
+
+If first line of the message begins with `#` and ends with line break it counts as note title. Otherwise note title is set to template `Telegram Note 2006-01-02 15:04:05`. 
+
 ## Template
 
 ### Example
@@ -42,6 +46,7 @@ Themes:
 {{content}}
 
 ## Refs
+- {{ref}}
 ```
 
 ### Placeholders
@@ -50,3 +55,4 @@ Themes:
 - {{time}} - time 15:04
 - {{date}} - date 2006-01-02
 - {{title}} - post title Telegram Note 2006-01-02 15:04:05
+- {{ref}} - original message link for forwarded messages (if none replaced with "")
